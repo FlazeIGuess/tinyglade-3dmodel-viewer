@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Model Viewer</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Background
+        renderer.setClearColor(0xffffff, 1); // Change Background Color
+
+        // Light
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(0, 1, 1).normalize();
+        scene.add(light);
+
+        async function loadModel() {
+            const response = await fetch('ladder.json'); //change the model
+            const modelData = await response.json();
+
+
+            const geometry = new THREE.BufferGeometry();
+
+
+            const vertices = new Float32Array(modelData.Vertex_Position.buffer.flat());
+            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+
+
+            if (modelData.Vertex_Normal) {
+                const normals = new Float32Array(modelData.Vertex_Normal.buffer.flat());
+                geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+            }
+
+            if (modelData.Vertex_Color) {
+                const colors = new Float32Array(modelData.Vertex_Color.buffer.flat());
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            }
+
+            const indices = new Uint16Array(modelData.indices.buffer);
+            geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+
+            const material = new THREE.MeshStandardMaterial({ vertexColors: true });
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            camera.position.z = 5;
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                mesh.rotation.x += 0.01;
+                mesh.rotation.y += 0.01;
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        }
+
+        loadModel();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
