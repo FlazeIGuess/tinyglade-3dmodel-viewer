@@ -8,3 +8,4 @@
 Copy the model you want to see to the repository folder.
 Change the model name in the index.html file for example "ladder.json"
 run the "run-server.bat" the cmd windows should show urls, open one of them and voila, you can see the model.
+## Try my Tiny Glade [Blender Addon](https://github.com/FlazeIGuess/TinyGlade-Blender-AddOn/tree/main)
